@@ -1,0 +1,54 @@
+$active-color: #2e53ab;
+$white-color: #FFF;
+$black-color: #111;
+
+.button {
+    &-default {
+    background-color: $white-color;
+    color: $black-color;
+    }
+
+    &-active {
+        background-color: $active-color;
+        color: $white-color;
+    }
+}
+h2,h3 {
+    margin-top:0.25em !important;
+}
+p {
+    line-height: 1em;
+}
+
+.exchange {
+    &-volume-text {
+        color: #aaa;
+    }
+    &-volume-success {
+        color: rgb(3, 184, 31);
+    }
+    &-volume-danger {
+        color: #FF0000;
+    }
+    &-loading {
+        width: 100%;
+        padding: 120px 0px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 1000;
+        height: 240px;
+      }
+}
+
+.pair {
+    &-card {
+        box-shadow: none !important;
+    }
+}
+
+        
+    
