@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { convertSymbolLower, convertSymbolUpper, moneyFormat } from '../utils/symbol';
 import { useTypedSelector } from "../hooks/useTypeSelector";
 import { useDispatch } from 'react-redux';
-import { getExchangeRate } from "../redux/actions/exchange.action";
 import { Dispatch } from "redux";
+import { ActionType } from '../redux/actionTypes/exchange';
 
 const { Title, Text } = Typography;
 
@@ -34,12 +34,13 @@ export default function Exchange() {
             setAutoFetch(5)
             setPairLasted(param.pair)
         }
-        const fetchExchangeRate = async () => {
+        const fetchExchangeRate = () => {
+            const action = (type, payload)=> dispatch({type,payload})
             if (param.pair) {
                 try {
                     const symbol = convertSymbolLower(param.pair)
                     if (!exchangeRate.loading) {
-                        await dispatch(getExchangeRate(symbol));
+                        action(ActionType.GET_EXCHANGE_REQ, symbol)
                     }
                 } catch (error) {
                     console.log(error)
@@ -61,7 +62,7 @@ export default function Exchange() {
     }, [autoFetch, param.pair])
 
     return (
-        <Card style={{ width: '100%', height: '240px' }}>
+        <Card style={{ width: '100%', height: '260px' }}>
             {loadingPage ?
                 <div className="exchange-loading">
                     <Spin />
@@ -71,7 +72,9 @@ export default function Exchange() {
             <Text className="exchange-volume-text"><p>Volume : {data.payload.quoteVolume ? moneyFormat(data.payload.quoteVolume) : ''}</p></Text>
             <Text className="exchange-volume-text"><p>High price : {data.payload.highPrice ? moneyFormat(data.payload.highPrice) : ''}</p></Text>
             <Text className="exchange-volume-text"><p>Low price : {data.payload.lowPrice ? moneyFormat(data.payload.lowPrice) : ''}</p></Text>
-            <Text className={parseFloat(data.payload.priceChangePercent) < 0 ? 'exchange-volume-danger' : 'exchange-volume-success'}><p>Change : {data.payload.priceChangePercent ? moneyFormat(data.payload.priceChangePercent) + '%' : ''} </p></Text>
+            <Text className={parseFloat(data.payload.priceChangePercent) < 0 ? 'exchange-volume-danger' : 'exchange-volume-success'}>
+                <p>Change : {data.payload.priceChangePercent ? moneyFormat(data.payload.priceChangePercent) + '%' : ''} </p></Text>
+            {exchangeRate.loading ? <p style={{ 'textAlign': 'right' }}><Spin /></p> : ''}
         </Card>
     )
 }

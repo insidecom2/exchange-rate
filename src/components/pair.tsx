@@ -6,13 +6,14 @@ import { convertSymbolUpper } from "../utils/symbol";
 
 export default function Coin() {
     const router = useRouter()
+
     const coinLists: string[] = ['BTC/THB', 'BUSD/THB', 'USDT/THB'];
     const { pair, loading, error } = useTypedSelector((state) => state.param);
-
     const changeCoin = (coin: string) => {
         const param:string = coin.replace('/', '_');
         router.push(`/market/${param}`)
     }
+
     return (
         <>
             <Card style={{ width: '100%' }} bordered={false} className="pair-card">

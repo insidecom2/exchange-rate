@@ -1,13 +1,23 @@
-import { put, takeEvery, all } from 'redux-saga/effects'
+import { put, takeEvery } from 'redux-saga/effects'
 import { ActionType } from '../actionTypes/param'
 
-export function* setPairAction(payload: string) {
+interface Pair {
+    type: string,
+    payload: string
+}
+export function* setPairAction(payload: Pair) {
+    yield put({
+        type: ActionType.GET_PAIR_PENDING,
+        payload: ''
+    })
+
     yield put({
         type: ActionType.GET_PAIR_SUCCESS,
-        payload: payload
+        loading: false,
+        payload: payload.payload
     })
 }
 
-export function* watchPairAction() {
-    yield takeEvery(ActionType.GET_PAIR_PENDING, setPairAction)
+export function* watchSetPair() {
+    yield takeEvery(ActionType.GET_PAIR_REQ, setPairAction)
 }

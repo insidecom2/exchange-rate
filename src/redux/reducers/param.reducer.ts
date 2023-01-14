@@ -24,11 +24,6 @@ export const paramReducer = (state:State = initialState, action: Action): State 
                 loading: false,
                 pair: action.payload
             }
-        case ActionType.GET_PAIR_FAIL:
-            return {
-                loading: false,
-                error: action.payload 
-            }
         default: 
             return state;
     }

@@ -5,16 +5,23 @@ import Exchange from "../../src/components/exchange";
 import Head from 'next/head'
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { setPair } from "../../src/redux/actions/param.action";
+// import { setPair } from "../../src/redux/actions/param.action";
 import { Dispatch } from "redux";
+import { ActionType } from "../../src/redux/actionTypes/param";
+// import { pairSaga, setPairAction } from '../../src/redux/sagas/param.action';
 
 export default function Market() {
     const router = useRouter()
     const { param } = router.query
-    const dispatch:Dispatch<any> = useDispatch();
+    const dispatch: Dispatch<any> = useDispatch();
+    
+    const action = (type, payload) => dispatch({ type, payload })
 
-    dispatch(setPair(param));
-        
+    useEffect(() => {
+        if (param) {
+            action(ActionType.GET_PAIR_REQ, param);            
+        }
+    },[param])
     return (
         <div>
             <Head>
