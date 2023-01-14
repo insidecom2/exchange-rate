@@ -2,16 +2,16 @@ import { Card, Spin } from "antd";
 import React, { useEffect } from 'react';
 import { Typography } from 'antd';
 import { useState } from 'react';
-import { convertSymbolLower, convertSymbolUpper, moneyFormat } from '../utils/symbol';
+import { convertSymbolLower, convertSymbolUpper, lowerSymbol, moneyFormat } from '../utils/symbol';
 import { useTypedSelector } from "../hooks/useTypeSelector";
 import { useDispatch } from 'react-redux';
 import { Dispatch } from "redux";
 import { ActionType } from '../redux/actionTypes/exchange';
+import useWebSocket from "react-use-websocket";
 
 const { Title, Text } = Typography;
 
 export default function Exchange() {
-    const [autoFetch, setAutoFetch] = useState<number>(5)
     const dispatch: Dispatch<any> = useDispatch();
     const param = useTypedSelector((state) => state.param);
     const exchangeRate = useTypedSelector((state) => state.exchangeRate);
@@ -19,7 +19,8 @@ export default function Exchange() {
         payload: {},
         loading: false,
     });
-    const [pairLasted, setPairLasted] = useState<string>(param.pair);
+    const socketUrl = 'wss://ws.satangcorp.com/ws/!miniTicker@arr';
+    const {  lastMessage } = useWebSocket(socketUrl);
     const [loadingPage, setLoadingPage] = useState<boolean>(true)
 
     useEffect(() => {
@@ -30,51 +31,38 @@ export default function Exchange() {
     }, [exchangeRate]);
 
     useEffect(() => {
-        if (pairLasted !== param.pair) {
-            setAutoFetch(5)
-            setPairLasted(param.pair)
-        }
-        const fetchExchangeRate = () => {
-            const action = (type, payload)=> dispatch({type,payload})
-            if (param.pair) {
-                try {
-                    const symbol = convertSymbolLower(param.pair)
-                    if (!exchangeRate.loading) {
-                        action(ActionType.GET_EXCHANGE_REQ, symbol)
+        const selectData = (data: string) => {
+            const dataArray = JSON.parse(data)
+            let dataUsed: object[] = [];
+            if (dataArray.length >0) {
+                dataUsed = dataArray.filter((data) => {
+                    if (data.s === lowerSymbol(param.pair)) {
+                        return data
                     }
-                } catch (error) {
-                    console.log(error)
-                }
+                })
+            }
+            return dataUsed.length > 0 ? dataUsed[0] : {};
+        }
+        if (lastMessage !== null) {
+            const exchangeData: object = selectData(lastMessage.data);
+            const action = (type, payload)=> dispatch({type,payload})
+            if (exchangeData) {
+                action(ActionType.GET_EXCHANGE_REQ, exchangeData)
             }
         }
-
-        if (autoFetch === 5) {
-            fetchExchangeRate();
-        }
-        const interval = setInterval(() => {
-            if (autoFetch - 1 >= 0) {
-                setAutoFetch(autoFetch - 1);
-            } else {
-                setAutoFetch(5)
-            }
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [autoFetch, param.pair])
+      }, [lastMessage]);
 
     return (
-        <Card style={{ width: '100%', height: '260px' }}>
+        <Card style={{ width: '100%', height: '220px' }}>
             {loadingPage ?
                 <div className="exchange-loading">
                     <Spin />
                 </div> : ''}
             <Title level={3}>{convertSymbolUpper(param.pair)}</Title>
-            <Title level={2} style={{ height: '30px' }}>{data.payload.lastPrice ? moneyFormat(data.payload.lastPrice) : ''}</Title>
-            <Text className="exchange-volume-text"><p>Volume : {data.payload.quoteVolume ? moneyFormat(data.payload.quoteVolume) : ''}</p></Text>
-            <Text className="exchange-volume-text"><p>High price : {data.payload.highPrice ? moneyFormat(data.payload.highPrice) : ''}</p></Text>
-            <Text className="exchange-volume-text"><p>Low price : {data.payload.lowPrice ? moneyFormat(data.payload.lowPrice) : ''}</p></Text>
-            <Text className={parseFloat(data.payload.priceChangePercent) < 0 ? 'exchange-volume-danger' : 'exchange-volume-success'}>
-                <p>Change : {data.payload.priceChangePercent ? moneyFormat(data.payload.priceChangePercent) + '%' : ''} </p></Text>
-            {exchangeRate.loading ? <p style={{ 'textAlign': 'right' }}><Spin /></p> : ''}
+            <Title level={2} style={{ height: '30px' }}>{data.payload.c ? moneyFormat(data.payload.c) : ''}</Title>
+            <Text className="exchange-volume-text"><p>Volume : {data.payload.q ? moneyFormat(data.payload.q) : ''}</p></Text>
+            <Text className="exchange-volume-text"><p>High price : {data.payload.h ? moneyFormat(data.payload.h) : ''}</p></Text>
+            <Text className="exchange-volume-text"><p>Low price : {data.payload.l ? moneyFormat(data.payload.l) : ''}</p></Text>
         </Card>
     )
 }

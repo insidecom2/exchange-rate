@@ -5,6 +5,7 @@ interface Pair {
     type: string,
     payload: string
 }
+
 export function* setPairAction(payload: Pair) {
     yield put({
         type: ActionType.GET_PAIR_PENDING,

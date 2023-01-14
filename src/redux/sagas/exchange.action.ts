@@ -3,36 +3,20 @@ import { ActionType } from '../actionTypes/exchange'
 
 interface Exchange {
     type: string,
-    payload: string
+    payload: object
 }
 function* setExchangeAction(payload: Exchange) {
-    const pair:string = payload.payload
-    
-        //try {
-            yield put({
-                type: ActionType.GET_EXCHANGE_PENDING,
-                payload: {}
-            })
-            const response = yield fetch(`https://satangcorp.com/api/v3/ticker/24hr?symbol=${pair}`).then((response) => {
-                return response.json().then((data) => {
-                    return data;
-                }).catch((err) => {
-                    console.log(err);
-                })
-            });
+    const data: object = payload.payload
+    yield put({
+        type: ActionType.GET_EXCHANGE_PENDING,
+        payload: {}
+    })
 
-            yield put({
-                type: ActionType.GET_EXCHANGE_SUCCESS,
-                payload:response
-            })
-        // } catch (error) {
-        //     yield put({
-        //         type: ActionType.GET_EXCHANGE_FAIL,
-        //         payload: {}
-        //     })
-        // }
-   
-   
+    yield put({
+        type: ActionType.GET_EXCHANGE_SUCCESS,
+        payload: data
+    })
+
 }
 
 export function* watchSetExchange() {

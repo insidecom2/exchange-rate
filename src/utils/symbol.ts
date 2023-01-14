@@ -18,3 +18,7 @@ export function moneyFormat(number: number): string {
     }
     return '';
 }
+
+export function lowerSymbol(symbol: any) {
+    return symbol.toLowerCase();
+}
