@@ -30,8 +30,8 @@ export default function Market() {
             <Row justify="space-around" align="middle" style={{ 'height': '90vh' }}>
                 <Col span={24}>
                     <Row justify="center" gutter={[16, 16]}>
-                        <Col span={6} xs={{ span: 24 }}><Coin /></Col>
-                        <Col span={6} xs={{ span: 24 }}><Exchange /></Col>
+                        <Col xs={{ span: 24 }} sm={{ span: 12 }} md={{ span: 8 }} xl={{ span: 6 }}><Coin /></Col>
+                        <Col xs={{ span: 24 }} sm={{ span: 12 }} md={{ span: 8 }} xl={{ span: 6 }}><Exchange /></Col>
                     </Row>
                 </Col>
             </Row>
