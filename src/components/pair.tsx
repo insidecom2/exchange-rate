@@ -20,7 +20,7 @@ export default function Coin() {
                 <Space direction="vertical" style={{ width: '100%' }}>
                     {coinLists.map((data: string, key: number) => {
                         const classActive: string = (data === convertSymbolUpper(pair) ? "button-active" : "button-default");
-                            return <Button key={key} size={'large'} block className={classActive} onClick={() => changeCoin(data) }>{data}</Button>
+                        return <Button key={key} id={`btn-${key}`} size={'large'} block className={classActive} onClick={() => changeCoin(data) }>{data}</Button>
                         })
                     }
                 </Space>

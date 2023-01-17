@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "cypress/e2e/app.spect.ts", "cypress/e2e/app.spect.ts"],
   "exclude": [
     "node_modules"
   ]
