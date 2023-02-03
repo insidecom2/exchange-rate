@@ -16,7 +16,7 @@ interface actionSuccess {
 
 interface actionFail {
     type: ActionType.GET_EXCHANGE_FAIL;
-    payload: object ;
+    payload: object;
 }
 
 export type Action = actionPending | actionSuccess | actionFail;

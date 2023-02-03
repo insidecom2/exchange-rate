@@ -5,10 +5,11 @@ import Exchange from "../../src/components/exchange";
 import Head from 'next/head'
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-// import { setPair } from "../../src/redux/actions/param.action";
 import { Dispatch } from "redux";
 import { ActionType } from "../../src/redux/actionTypes/param";
-// import { pairSaga, setPairAction } from '../../src/redux/sagas/param.action';
+import { lowerSymbol } from "../../src/utils/symbol";
+import useWebSocket from "react-use-websocket";
+import { useFetchExchangeRate } from "../../src/hooks/useFetchExchangeRate";
 
 export default function Market() {
     const router = useRouter()
@@ -17,11 +18,42 @@ export default function Market() {
 
     const action = (type, payload) => dispatch({ type, payload })
 
+    const socketUrl = 'wss://ws.satangcorp.com/ws/!miniTicker@arr';
+    const { lastMessage } = useWebSocket(socketUrl);
+
     useEffect(() => {
         if (param) {
             action(ActionType.GET_PAIR_REQ, param);
         }
     }, [param])
+
+    useEffect(() => {
+        getWebsocketExchangeRate();
+    }, [lastMessage]);
+
+    const selectData = (data: string) => {
+        const dataArray = JSON.parse(data)
+        let dataUsed: object[] = [];
+        if (dataArray.length > 0) {
+            dataUsed = dataArray.filter((data) => {
+                if (data.s === lowerSymbol(param)) {
+                    return data
+                }
+            })
+        }
+        return dataUsed.length > 0 ? dataUsed[0] : {};
+    }
+
+    const getWebsocketExchangeRate = () => {
+        if (lastMessage !== null) {
+            const exchangeData: object = selectData(lastMessage.data);
+            const action = (type, payload) => dispatch({ type, payload })
+            if (exchangeData) {
+                useFetchExchangeRate({ action: action, exchangeData: exchangeData })
+            }
+        }
+    }
+
     return (
         <div>
             <Head>
