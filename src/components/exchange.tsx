@@ -2,64 +2,33 @@ import { Card, Spin } from "antd";
 import React, { useEffect } from 'react';
 import { Typography } from 'antd';
 import { useState } from 'react';
-import { convertSymbolLower, convertSymbolUpper, moneyFormat } from '../utils/symbol';
+import { convertSymbolUpper, moneyFormat } from '../utils/symbol';
 import { useTypedSelector } from "../hooks/useTypeSelector";
-import { useDispatch } from 'react-redux';
-import { Dispatch } from "redux";
-import { ActionType } from '../redux/actionTypes/exchange';
 
 const { Title, Text } = Typography;
 
 export default function Exchange() {
-    const [autoFetch, setAutoFetch] = useState<number>(5)
-    const dispatch: Dispatch<any> = useDispatch();
+
     const param = useTypedSelector((state) => state.param);
     const exchangeRate = useTypedSelector((state) => state.exchangeRate);
     const [data, setData] = useState<typeof exchangeRate>({
         payload: {},
         loading: false,
     });
-    const [pairLasted, setPairLasted] = useState<string>(param.pair);
+
     const [loadingPage, setLoadingPage] = useState<boolean>(true)
 
-    useEffect(() => {
+    const getExchangeRate = () => {
         if (Object.keys(exchangeRate.payload).length > 0) {
             setData(exchangeRate)
             if (loadingPage) setLoadingPage(false)
         }
-    }, [exchangeRate]);
+    }
 
     useEffect(() => {
-        if (pairLasted !== param.pair) {
-            setAutoFetch(5)
-            setPairLasted(param.pair)
-        }
-        const fetchExchangeRate = () => {
-            const action = (type, payload)=> dispatch({type,payload})
-            if (param.pair) {
-                try {
-                    const symbol = convertSymbolLower(param.pair)
-                    if (!exchangeRate.loading) {
-                        action(ActionType.GET_EXCHANGE_REQ, symbol)
-                    }
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-        }
+        getExchangeRate();
+    }, [exchangeRate]);
 
-        if (autoFetch === 5) {
-            fetchExchangeRate();
-        }
-        const interval = setInterval(() => {
-            if (autoFetch - 1 >= 0) {
-                setAutoFetch(autoFetch - 1);
-            } else {
-                setAutoFetch(5)
-            }
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [autoFetch, param.pair])
 
     return (
         <Card style={{ width: '100%', height: '260px' }}>
